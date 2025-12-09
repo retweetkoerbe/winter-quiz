@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wintertiere-Quiz für Grundschüler</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #b3d9ff 0%, #e6f3ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-image {
+            max-width: 100%;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-buttons {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(135deg, #87ceeb 0%, #b0e0e6 100%);
+            border: 3px solid #4682b4;
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 1.2em;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(135deg, #4682b4 0%, #5f9ea0 100%);
+            color: white;
+        }
+
+        .answer-btn:active {
+            transform: translateY(0);
+        }
+
+        .answer-btn.correct {
+            background: #90ee90 !important;
+            border-color: #228b22 !important;
+            color: #006400 !important;
+        }
+
+        .answer-btn.incorrect {
+            background: #ffcccc !important;
+            border-color: #cc0000 !important;
+            color: #8b0000 !important;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .progress {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .result-screen {
+            display: none;
+        }
+
+        .result-screen.active {
+            display: block;
+        }
+
+        .result-message {
+            font-size: 1.8em;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #dbeafe;
+            border-radius: 15px;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: 3px solid #ffa500;
+            border-radius: 25px;
+            padding: 15px 40px;
+            font-size: 1.3em;
+            color: #8b4513;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 165, 0, 0.4);
+        }
+
+        .detailed-summary {
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .summary-title {
+            font-size: 1.3em;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .question-item {
+            background: #f9f9f9;
+            margin-bottom: 12px;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #ccc;
+            text-align: left;
+        }
+
+        .question-item.correct {
+            background: #f0fdf4;
+            border-left-color: #22c55e;
+        }
+
+        .question-item.incorrect {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #666;
+        }
+
+        .status-icon {
+            font-size: 1.2em;
+        }
+
+        .question-text {
+            margin: 8px 0;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .answer-comparison {
+            margin-top: 8px;
+            font-size: 0.95em;
+        }
+
+        .user-answer {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .correct-answer {
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffa500;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recommendations h3 {
+            color: #d68910;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .recommendations ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .recommendations li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        /* Konfetti Overlay */
+        #confetti-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 9999;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 16px;
+            opacity: 0.9;
+            will-change: transform, opacity;
+            border-radius: 2px;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translate3d(var(--x, 0px), -10vh, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate3d(var(--xEnd, 0px), 110vh, 0) rotate(720deg);
+                opacity: 0.9;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>❄️ Wintertiere-Quiz ❄️</h1>
+        
+        <div id="quiz-screen">
+            <div class="question" id="question"></div>
+            <div id="question-image-container"></div>
+            <div class="answer-buttons" id="answer-buttons"></div>
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <div class="result-screen" id="result-screen">
+            <div class="result-message" id="result-message"></div>
+            <div class="detailed-summary" id="detailed-summary"></div>
+            <button class="restart-btn" id="restart-btn">🔄 Nochmal spielen!</button>
+        </div>
+
+        <div id="confetti-overlay"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Zeige hier das Bild vom Eichhörnchen. Zeige auf den langen, buschigen Schwanz. Wie heißt dieser Körperteil des Eichhörnchens?",
+                image: "img/eichhörnchen.png",
+                answers: ["Die Schnauze", "Der Rumpf", "Der Schwanz", "Die Vorderpfote"],
+                correct: 2,
+                description: "Eichhörnchen mit langem, buschigem Schwanz"
+            },
+            {
+                question: "Zeige hier das Bild mit dem Bett und den drei Tieren. Ein Tier hat sich im \"Winterschlaf-Bett\" verirrt. Welches Tier passt hier nicht hinein?",
+                image: "img/winterschlaf.png",
+                answers: ["Das Eichhörnchen (oder Hamster)", "Die Fledermaus", "Der Fisch", "Alle dürfen im Bett schlafen"],
+                correct: 2,
+                description: "Bett mit drei Tieren - eines passt nicht hinein"
+            },
+            {
+                question: "Das Eichhörnchen schläft im Winter viel, wacht aber auf, um zu fressen. Wie nennt man das?",
+                image: null,
+                answers: ["Winterschlaf", "Winterruhe", "Winterstarre", "Sommerschlaf"],
+                correct: 1
+            },
+            {
+                question: "Wo wohnt das Eichhörnchen? Wie nennt man sein Nest?",
+                image: null,
+                answers: ["Kobel", "Horst", "Höhle", "Hütte"],
+                correct: 0
+            },
+            {
+                question: "Der Storch findet im Winter hier kein Futter. Was ist seine Strategie?",
+                image: null,
+                answers: ["Er gräbt sich im Schlamm ein.", "Er frisst Nüsse.", "Er ist ein Winterflüchter und fliegt nach Afrika.", "Er bekommt ein dickes Fell."],
+                correct: 2
+            },
+            {
+                question: "Der Igel frisst sich im Herbst eine dicke Speckschicht an. Was macht er im Winter?",
+                image: null,
+                answers: ["Er fliegt in den Süden.", "Er hält Winterschlaf in einem Laubhaufen.", "Er sammelt Pilze.", "Er wird steif und friert ein."],
+                correct: 1
+            },
+            {
+                question: "Was passiert mit dem Frosch, wenn es kalt wird?",
+                image: null,
+                answers: ["Er fällt in eine Kältestarre (Winterstarre).", "Er baut sich ein Nest auf einem Baum.", "Er wandert in warme Länder.", "Er wärmt sich am Lagerfeuer."],
+                correct: 0
+            },
+            {
+                question: "Wie sehen junge Eichhörnchen direkt nach der Geburt aus?",
+                image: null,
+                answers: ["Sie haben schon lange Zähne.", "Sie können sofort klettern.", "Sie sind nackt, taub und blind.", "Sie sehen aus wie kleine Frösche."],
+                correct: 2
+            },
+            {
+                question: "Wer sind die Feinde des Eichhörnchens?",
+                image: null,
+                answers: ["Löwe und Tiger", "Marder, Katze und Eule", "Hund und Huhn", "Nur der Mensch"],
+                correct: 1
+            },
+            {
+                question: "Welches Futter sammelt das Eichhörnchen für den Winter?",
+                image: null,
+                answers: ["Nüsse, Pilze und Samen", "Wurst und Käse", "Gras und Heu", "Fische und Fliegen"],
+                correct: 0
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answerSelected = false;
+        let answerHistory = [];
+        let shuffledQuestions = [];
+        
+        // Shuffle questions function (Fisher-Yates algorithm)
+        function shuffleQuestions(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Shuffle questions on page load
+        shuffledQuestions = shuffleQuestions(questions);
+
+        function showQuestion() {
+            const questionData = shuffledQuestions[currentQuestion];
+            document.getElementById('question').textContent = questionData.question;
+            
+            const imageContainer = document.getElementById('question-image-container');
+            if (questionData.image) {
+                const img = document.createElement('img');
+                img.src = questionData.image;
+                img.alt = questionData.description || 'Tier-Bild';
+                img.className = 'question-image';
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(img);
+            } else {
+                imageContainer.innerHTML = '';
+            }
+            
+            const answerButtons = document.getElementById('answer-buttons');
+            answerButtons.innerHTML = '';
+            
+            questionData.answers.forEach((answer, index) => {
+                const button = document.createElement('button');
+                button.classList.add('answer-btn');
+                button.textContent = `${String.fromCharCode(65 + index)}) ${answer}`;
+                button.addEventListener('click', () => selectAnswer(index));
+                answerButtons.appendChild(button);
+            });
+            
+            answerSelected = false;
+            document.getElementById('progress').textContent = `Frage ${currentQuestion + 1} von ${shuffledQuestions.length}`;
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (answerSelected) return;
+            answerSelected = true;
+            
+            const questionData = shuffledQuestions[currentQuestion];
+            const buttons = document.querySelectorAll('.answer-btn');
+            
+            const isCorrect = selectedIndex === questionData.correct;
+            if (isCorrect) {
+                score++;
+            }
+            
+            // Track answer history
+            answerHistory.push({
+                questionNumber: currentQuestion + 1,
+                question: questionData.question,
+                userAnswer: questionData.answers[selectedIndex],
+                correctAnswer: questionData.answers[questionData.correct],
+                isCorrect: isCorrect
+            });
+            
+            buttons.forEach((button, index) => {
+                button.disabled = true;
+                
+                if (index === selectedIndex) {
+                    if (isCorrect) {
+                        button.classList.add('correct');
+                    } else {
+                        button.classList.add('incorrect');
+                    }
+                }
+                
+                if (index === questionData.correct) {
+                    button.classList.add('correct');
+                }
+            });
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < shuffledQuestions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1500);
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('result-screen').classList.add('active');
+            
+            const percentage = Math.round((score / shuffledQuestions.length) * 100);
+            const baseMsg = `Du hast ${score} von ${shuffledQuestions.length} Fragen richtig!`;
+            const cheer = percentage === 100
+                ? '🎉 Perfekt! Unglaubliche Leistung!'
+                : percentage >= 80
+                ? '🏆 Mega! Richtig stark!'
+                : percentage >= 60
+                ? '👍 Stark! Das läuft!'
+                : '✨ Weiter so! Super Einsatz!';
+            document.getElementById('result-message').textContent = `${cheer} ${baseMsg}`;
+            
+            // Generate detailed summary
+            generateDetailedSummary();
+
+            // Start confetti celebration
+            launchConfetti(4000);
+        }
+        
+        function generateDetailedSummary() {
+            const summaryContainer = document.getElementById('detailed-summary');
+            let html = '<div class="summary-title">📋 Deine Antworten im Detail</div>';
+            
+            // Generate question-by-question breakdown
+            answerHistory.forEach(item => {
+                const statusClass = item.isCorrect ? 'correct' : 'incorrect';
+                const statusIcon = item.isCorrect ? '✓' : '✗';
+                
+                html += `
+                    <div class="question-item ${statusClass}">
+                        <div class="question-header">
+                            <span class="question-number">Frage ${item.questionNumber}</span>
+                            <span class="status-icon">${statusIcon}</span>
+                        </div>
+                        <div class="question-text">${item.question}</div>
+                        <div class="answer-comparison">
+                            <div class="user-answer">Deine Antwort: ${item.userAnswer}</div>
+                            ${!item.isCorrect ? `<div class="correct-answer">Richtige Antwort: ${item.correctAnswer}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Generate recommendations based on error patterns
+            const recommendations = generateRecommendations();
+            if (recommendations.length > 0) {
+                html += '<div class="recommendations"><h3>💡 Verbesserungsvorschläge</h3><ul>';
+                recommendations.forEach(rec => {
+                    html += `<li>${rec}</li>`;
+                });
+                html += '</ul></div>';
+            }
+            
+            summaryContainer.innerHTML = html;
+        }
+        
+        function generateRecommendations() {
+            const recommendations = [];
+            const wrongAnswers = answerHistory.filter(item => !item.isCorrect);
+            
+            if (wrongAnswers.length === 0) return [];
+            
+            // Check for animal identification errors
+            const animalIdErrors = wrongAnswers.filter(item => 
+                item.question.includes('Tier') || 
+                item.question.includes('Eichhörnchen') ||
+                item.question.includes('Bild')
+            ).length;
+            
+            if (animalIdErrors > 0) {
+                recommendations.push('Übe die Erkennung der verschiedenen Wintertiere. Schau dir die Bilder genau an.');
+            }
+            
+            // Check for winter behavior errors
+            const behaviorErrors = wrongAnswers.filter(item => 
+                item.question.includes('Winterschlaf') || 
+                item.question.includes('Winterruhe') ||
+                item.question.includes('Winterstarre') ||
+                item.question.includes('Winterflüchter')
+            ).length;
+            
+            if (behaviorErrors > 0) {
+                recommendations.push('Informiere dich über die verschiedenen Winterstrategien der Tiere - Winterschlaf, Winterruhe, Winterstarre und Winterflucht.');
+            }
+            
+            // Check for habitat/food errors
+            const habitatErrors = wrongAnswers.filter(item => 
+                item.question.includes('Nest') || 
+                item.question.includes('Kobel') ||
+                item.question.includes('Futter') ||
+                item.question.includes('sammelt')
+            ).length;
+            
+            if (habitatErrors > 0) {
+                recommendations.push('Lerne mehr über die Lebensweise der Wintertiere - wo sie wohnen und was sie fressen.');
+            }
+            
+            // General encouragement
+            if (wrongAnswers.length >= 5) {
+                recommendations.push('Mache das Quiz ruhig nochmal - Übung macht den Meister!');
+            }
+            
+            return recommendations;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answerSelected = false;
+            answerHistory = [];
+            
+            // Re-shuffle questions for a new random order
+            shuffledQuestions = shuffleQuestions(questions);
+            
+            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('result-screen').classList.remove('active');
+            
+            clearConfetti();
+            showQuestion();
+        }
+
+        document.getElementById('restart-btn').addEventListener('click', restartQuiz);
+
+        // Konfetti Logik
+        function launchConfetti(duration = 4000) {
+            const overlay = document.getElementById('confetti-overlay');
+            if (!overlay) return;
+
+            const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#e84393', '#ffd32a'];
+            const particles = 180;
+            const startTime = Date.now();
+
+            for (let i = 0; i < particles; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.backgroundColor = color;
+                const left = Math.random() * 100; // vw
+                const xDrift = (Math.random() * 40 - 20) + 'vw';
+                piece.style.left = left + 'vw';
+                piece.style.setProperty('--x', (Math.random() * 20 - 10) + 'px');
+                piece.style.setProperty('--xEnd', xDrift);
+                piece.style.animation = `confetti-fall ${3 + Math.random() * 2}s linear ${Math.random()}s forwards`;
+                piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+                overlay.appendChild(piece);
+            }
+
+            // Cleanup after duration
+            setTimeout(() => {
+                clearConfetti();
+            }, duration);
+        }
+
+        function clearConfetti() {
+            const overlay = document.getElementById('confetti-overlay');
+            if (!overlay) return;
+            overlay.innerHTML = '';
+        }
+
+        showQuestion();
+    </script>
+</body>
+</html>
