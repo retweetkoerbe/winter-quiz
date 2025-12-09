@@ -375,6 +375,81 @@
                 image: null,
                 answers: ["Nüsse, Pilze und Samen", "Wurst und Käse", "Gras und Heu", "Fische und Fliegen"],
                 correct: 0
+            },
+            {
+                question: "Fülle die Lücken mit den richtigen Wörtern. Klicke die Wörter in der richtigen Reihenfolge an:",
+                image: null,
+                type: "fill-in-blanks",
+                blanks: [
+                    "Der Igel _____ den ganzen Winter in einem warmen Laubhaufen.",
+                    "Der Hamster hat bereits im Herbst viele Körner _____.",
+                    "Er _____ Winterruhe.",
+                    "Nur manchmal _____ er auf, um eine kleine Mahlzeit zu sich zu nehmen.",
+                    "Die Murmeltiere _____ eng aneinander gekuschelt in ihrem Bau."
+                ],
+                words: ["schlafen", "schläft", "gesammelt", "wacht", "hält"],
+                correctOrder: ["schläft", "gesammelt", "hält", "wacht", "schlafen"]
+            },
+            {
+                question: "Ergänze die Sätze mit den richtigen Begriffen zu den Winterstrategien:",
+                image: null,
+                type: "fill-in-blanks",
+                blanks: [
+                    "Tiere, die _____ halten, schlafen sehr tief und sparen viel Energie.",
+                    "Tiere in der _____ sind manchmal wach und fressen zwischendurch.",
+                    "Tiere mit _____ bleiben auch im Winter aktiv und suchen Futter.",
+                    "Tiere in _____ bewegen sich nicht mehr. Ihr Körper ist fast völlig erstarrt."
+                ],
+                words: ["Winterschlaf", "Winterruhe", "Winteraktivität", "Winterstarre"],
+                correctOrder: ["Winterschlaf", "Winterruhe", "Winteraktivität", "Winterstarre"]
+            },
+            {
+                question: "Warum fliegen manche Vögel im Winter weg oder schlafen tief?",
+                image: null,
+                answers: ["Weil sie gerne Urlaub machen.", "Weil sie im Winter keine Nahrung mehr finden.", "Weil es ihnen zu laut ist.", "Weil sie ihre Freunde in Afrika besuchen wollen."],
+                correct: 1
+            },
+            {
+                question: "Wie schwer ist ein ausgewachsenes Eichhörnchen ungefähr?",
+                image: null,
+                answers: ["So schwer wie eine Feder (10 Gramm).", "So schwer wie ein Schulkind (30 Kilogramm).", "Etwa 400 Gramm.", "Etwa 10 Kilogramm."],
+                correct: 2
+            },
+            {
+                question: "Tiere ohne Fell oder Federn (wie der Frosch) können sich nicht selbst warm halten. Was passiert mit ihnen?",
+                image: null,
+                answers: ["Sie stricken sich einen Pullover.", "Sie laufen ganz schnell, um warm zu bleiben.", "Sie erstarren und werden eiskalt (Winterstarre).", "Sie kuscheln sich an einen Bären."],
+                correct: 2
+            },
+            {
+                question: "Wohin genau fliegt der Storch, um Nahrung zu finden?",
+                image: null,
+                answers: ["Nach Australien", "Ins warme Afrika", "Nach Nordamerika", "Er fliegt nur ins nächste Dorf."],
+                correct: 1
+            },
+            {
+                question: "Das Eichhörnchen hat an der Schnauze lange Haare. Wie heißen sie?",
+                image: null,
+                answers: ["Schnurrbart", "Tasthaare", "Fühlhaare", "Riechhaare"],
+                correct: 1
+            },
+            {
+                question: "Was muss sich der Igel im Herbst anfressen, um den Winter zu überleben?",
+                image: null,
+                answers: ["Eine dicke Speckschicht", "Einen großen Muskel", "Lange Krallen", "Ein dickeres Fell"],
+                correct: 0
+            },
+            {
+                question: "Wo versteckt das Eichhörnchen seine gesammelten Nüsse?",
+                image: null,
+                answers: ["Es legt sie unter sein Kopfkissen.", "Es versteckt die Nahrung in der Erde.", "Es bringt sie in den Supermarkt.", "Es wirft sie ins Wasser."],
+                correct: 1
+            },
+            {
+                question: "In der Winterstarre sieht der Frosch fast so aus, als wäre er...",
+                image: null,
+                answers: ["... am Tanzen.", "... tot (ist er aber nicht).", "... am Fressen.", "... hellwach."],
+                correct: 1
             }
         ];
 
@@ -397,6 +472,8 @@
         // Shuffle questions on page load
         shuffledQuestions = shuffleQuestions(questions);
 
+        let selectedWords = [];
+        
         function showQuestion() {
             const questionData = shuffledQuestions[currentQuestion];
             document.getElementById('question').textContent = questionData.question;
@@ -416,16 +493,119 @@
             const answerButtons = document.getElementById('answer-buttons');
             answerButtons.innerHTML = '';
             
-            questionData.answers.forEach((answer, index) => {
-                const button = document.createElement('button');
-                button.classList.add('answer-btn');
-                button.textContent = `${String.fromCharCode(65 + index)}) ${answer}`;
-                button.addEventListener('click', () => selectAnswer(index));
-                answerButtons.appendChild(button);
-            });
+            if (questionData.type === 'fill-in-blanks') {
+                selectedWords = [];
+                showFillInBlanks(questionData, answerButtons);
+            } else {
+                questionData.answers.forEach((answer, index) => {
+                    const button = document.createElement('button');
+                    button.classList.add('answer-btn');
+                    button.textContent = `${String.fromCharCode(65 + index)}) ${answer}`;
+                    button.addEventListener('click', () => selectAnswer(index));
+                    answerButtons.appendChild(button);
+                });
+            }
             
             answerSelected = false;
             document.getElementById('progress').textContent = `Frage ${currentQuestion + 1} von ${shuffledQuestions.length}`;
+        }
+
+        function showFillInBlanks(questionData, container) {
+            const blanksContainer = document.createElement('div');
+            blanksContainer.style.marginBottom = '30px';
+            blanksContainer.style.textAlign = 'left';
+            blanksContainer.style.fontSize = '1.1em';
+            blanksContainer.style.lineHeight = '2';
+            
+            questionData.blanks.forEach((blank, index) => {
+                const blankDiv = document.createElement('div');
+                blankDiv.style.marginBottom = '15px';
+                const parts = blank.split('_____');
+                blankDiv.innerHTML = parts[0] + '<span id="blank-' + index + '" style="display:inline-block; min-width:120px; padding:5px 10px; background:#e8f5e9; border:2px solid #4caf50; border-radius:8px; font-weight:bold; color:#2d8659;"></span>' + (parts[1] || '');
+                blanksContainer.appendChild(blankDiv);
+            });
+            
+            container.appendChild(blanksContainer);
+            
+            const wordsContainer = document.createElement('div');
+            wordsContainer.style.display = 'grid';
+            wordsContainer.style.gap = '10px';
+            wordsContainer.style.marginTop = '20px';
+            
+            questionData.words.forEach((word, index) => {
+                const wordBtn = document.createElement('button');
+                wordBtn.classList.add('answer-btn');
+                wordBtn.textContent = word;
+                wordBtn.id = 'word-' + index;
+                wordBtn.addEventListener('click', () => selectWord(word, wordBtn, questionData));
+                wordsContainer.appendChild(wordBtn);
+            });
+            
+            container.appendChild(wordsContainer);
+            
+            const checkButton = document.createElement('button');
+            checkButton.textContent = '✓ Antwort prüfen';
+            checkButton.classList.add('restart-btn');
+            checkButton.style.marginTop = '20px';
+            checkButton.addEventListener('click', () => checkFillInBlanks(questionData));
+            container.appendChild(checkButton);
+        }
+
+        function selectWord(word, button, questionData) {
+            if (button.disabled) return;
+            if (selectedWords.length >= questionData.blanks.length) return;
+            
+            selectedWords.push(word);
+            button.disabled = true;
+            button.style.opacity = '0.3';
+            
+            const blankIndex = selectedWords.length - 1;
+            document.getElementById('blank-' + blankIndex).textContent = word;
+        }
+
+        function checkFillInBlanks(questionData) {
+            if (answerSelected) return;
+            if (selectedWords.length !== questionData.correctOrder.length) {
+                alert('Bitte fülle alle Lücken aus!');
+                return;
+            }
+            
+            answerSelected = true;
+            
+            const isCorrect = selectedWords.every((word, index) => word === questionData.correctOrder[index]);
+            
+            if (isCorrect) {
+                score++;
+            }
+            
+            questionData.blanks.forEach((blank, index) => {
+                const blankSpan = document.getElementById('blank-' + index);
+                if (selectedWords[index] === questionData.correctOrder[index]) {
+                    blankSpan.style.background = '#90ee90';
+                    blankSpan.style.borderColor = '#228b22';
+                } else {
+                    blankSpan.style.background = '#ffcccc';
+                    blankSpan.style.borderColor = '#cc0000';
+                    blankSpan.textContent += ' ✗ (richtig: ' + questionData.correctOrder[index] + ')';
+                }
+            });
+            
+            answerHistory.push({
+                questionNumber: currentQuestion + 1,
+                question: questionData.question,
+                userAnswer: selectedWords.join(', '),
+                correctAnswer: questionData.correctOrder.join(', '),
+                isCorrect: isCorrect
+            });
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < shuffledQuestions.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 3000);
         }
 
         function selectAnswer(selectedIndex) {
